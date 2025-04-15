@@ -1,2 +1,0 @@
-# AssureShop
-# AssureShop
