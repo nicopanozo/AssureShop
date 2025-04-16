@@ -1,13 +1,16 @@
 import { Router } from 'express';
 import productController from '../controllers/product.controller';
+import { isAdmin } from '../../middlewares/isAdmin';
 
 const router = Router();
 
-// Rutas para productos
+// Public Routes
 router.get('/', productController.getAllProducts);
 router.get('/:id', productController.getProductById);
-router.post('/', productController.createProduct);
-router.put('/:id', productController.updateProduct);
-router.delete('/:id', productController.deleteProduct);
+
+// ADMIN Actions
+router.post('/', isAdmin, productController.createProduct);
+router.put('/:id', isAdmin, productController.updateProduct);
+router.delete('/:id', isAdmin, productController.deleteProduct);
 
 export default router;
