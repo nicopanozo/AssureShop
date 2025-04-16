@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id     Int      @id @default(autoincrement())
+  email       String   @unique @db.VarChar(100)
+  password    String   @db.VarChar(255)
+  first_name  String   @db.VarChar(50)
+  last_name   String   @db.VarChar(50)
+  phone       String?  @db.VarChar(20)
+  address     String?
+  city        String?  @db.VarChar(50)
+  country     String?  @db.VarChar(50)
+  postal_code String?  @db.VarChar(20)
+  is_admin    Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+
+  reviews       Review[]
+  shopping_carts ShoppingCart[]
+  orders        Order[]
+
+  @@index([email], name: "idx_users_email")
+  @@map("users")
+}
+
+model Category {
+  category_id        Int        @id @default(autoincrement())
+  name               String     @unique @db.VarChar(50)
+  description        String?
+  parent_category_id Int?
+  created_at         DateTime   @default(now())
+  updated_at         DateTime   @default(now())
+
+  parent_category    Category?  @relation("CategoryToCategory", fields: [parent_category_id], references: [category_id])
+  subcategories      Category[] @relation("CategoryToCategory")
+  products           Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  product_id   Int      @id @default(autoincrement())
+  name         String   @db.VarChar(100)
+  description  String?
+  price        Decimal  @db.Decimal(10, 2)
+  category_id  Int
+  image_url    String?  @db.VarChar(255)
+  sku          String?  @unique @db.VarChar(50)
+  weight       Decimal? @db.Decimal(8, 2)
+  dimensions   String?  @db.VarChar(50)
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+
+  category      Category     @relation(fields: [category_id], references: [category_id])
+  inventory     Inventory?
+  reviews       Review[]
+  shopping_carts ShoppingCart[]
+  order_details OrderDetail[]
+
+  @@index([category_id], name: "idx_products_category")
+  @@index([name], name: "idx_products_name")
+  @@map("products")
+}
+
+model Inventory {
+  inventory_id      Int       @id @default(autoincrement())
+  product_id        Int       @unique
+  quantity          Int       @default(0)
+  location          String?   @db.VarChar(100)
+  last_restock_date DateTime?
+  next_restock_date DateTime?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @default(now())
+
+  product           Product   @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
+
+  @@map("inventory")
+}
+
+model Review {
+  review_id   Int      @id @default(autoincrement())
+  product_id  Int
+  user_id     Int
+  rating      Int
+  comment     String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+
+  product     Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
+  user        User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@unique([product_id, user_id])
+  @@index([product_id], name: "idx_reviews_product")
+  @@index([user_id], name: "idx_reviews_user")
+  @@map("reviews")
+}
+
+model ShoppingCart {
+  cart_id    Int      @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  quantity   Int      @default(1)
+  added_at   DateTime @default(now())
+
+  user       User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  product    Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
+
+  @@unique([user_id, product_id])
+  @@index([user_id], name: "idx_carts_user")
+  @@map("shopping_carts")
+}
+
+model Order {
+  order_id            Int      @id @default(autoincrement())
+  user_id             Int
+  order_date          DateTime @default(now())
+  total_amount        Decimal  @db.Decimal(12, 2)
+  shipping_address    String
+  shipping_city       String   @db.VarChar(50)
+  shipping_country    String   @db.VarChar(50)
+  shipping_postal_code String   @db.VarChar(20)
+  shipping_method     String   @db.VarChar(50)
+  payment_method      String   @db.VarChar(50)
+  order_status        String   @default("Pending") @db.VarChar(20)
+  tracking_number     String?  @db.VarChar(100)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @default(now())
+
+  user                User     @relation(fields: [user_id], references: [user_id])
+  order_details       OrderDetail[]
+
+  @@index([user_id], name: "idx_orders_user")
+  @@index([order_status], name: "idx_orders_status")
+  @@map("orders")
+}
+
+model OrderDetail {
+  order_detail_id Int      @id @default(autoincrement())
+  order_id        Int
+  product_id      Int
+  quantity        Int
+  unit_price      Decimal  @db.Decimal(10, 2)
+  discount        Decimal  @default(0) @db.Decimal(5, 2)
+  subtotal        Decimal  @db.Decimal(12, 2)
+  created_at      DateTime @default(now())
+
+  order           Order    @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+  product         Product  @relation(fields: [product_id], references: [product_id])
+
+  @@index([order_id], name: "idx_order_details_order")
+  @@index([product_id], name: "idx_order_details_product")
+  @@map("order_details")
+}
