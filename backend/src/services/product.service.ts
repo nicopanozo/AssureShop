@@ -3,7 +3,7 @@ import { CreateProductDto, UpdateProductDto, ProductFilters } from '../models/pr
 import logger from '../utils/logger';
 
 class ProductService {
-  // Obtener todos los productos
+  // Get all products, with optional filters
   async getAllProducts(filters?: ProductFilters) {
     try {
       const products = await productRepository.findAll(filters);
@@ -14,7 +14,7 @@ class ProductService {
     }
   }
 
-  // Obtener un producto por ID
+  // Get a product by ID
   async getProductById(id: number) {
     try {
       const product = await productRepository.findById(id);
@@ -28,7 +28,7 @@ class ProductService {
     }
   }
 
-  // Crear un nuevo producto
+  // Create a new product
   async createProduct(productData: CreateProductDto) {
     try {
       const newProduct = await productRepository.create(productData);
@@ -40,10 +40,9 @@ class ProductService {
     }
   }
 
-  // Actualizar un producto existente
+  // Update a product completely (PUT)
   async updateProduct(id: number, productData: UpdateProductDto) {
     try {
-      // Verificar que el producto existe
       const existingProduct = await productRepository.findById(id);
       if (!existingProduct) {
         throw new Error(`Product with ID ${id} not found`);
@@ -58,10 +57,26 @@ class ProductService {
     }
   }
 
-  // Eliminar un producto
+  // Partially update a product (PATCH)
+  async updatePartialProduct(id: number, productData: Partial<UpdateProductDto>) {
+    try {
+      const existingProduct = await productRepository.findById(id);
+      if (!existingProduct) {
+        throw new Error(`Product with ID ${id} not found`);
+      }
+
+      const updatedProduct = await productRepository.update(id, productData);
+      logger.info(`Product partially updated with ID: ${updatedProduct.product_id}`);
+      return updatedProduct;
+    } catch (error) {
+      logger.error(`Error partially updating product with ID ${id}: ${error}`);
+      throw error;
+    }
+  }
+
+  // Hard delete a product (permanent)
   async deleteProduct(id: number) {
     try {
-      // Verificar que el producto existe
       const existingProduct = await productRepository.findById(id);
       if (!existingProduct) {
         throw new Error(`Product with ID ${id} not found`);
