@@ -1,15 +1,15 @@
-import { Router } from 'express';
-import productRoutes from './product.routes';
+    import { Router } from 'express';
+    import productRoutes from './product.routes';
 
-const router = Router();
+    const router = Router();
 
-// Definir todas las rutas de la API
-router.use('/products', productRoutes);
+    // Definir todas las rutas de la API
+    router.use('/products', productRoutes);
 
-// Aquí puedes añadir más rutas en el futuro:
-// router.use('/users', userRoutes);
-// router.use('/orders', orderRoutes);
-// router.use('/categories', categoryRoutes);
-// etc.
+    // Aquí puedes añadir más rutas en el futuro:
+    // router.use('/users', userRoutes);
+    // router.use('/orders', orderRoutes);
+    // router.use('/categories', categoryRoutes);
+    // etc.
 
-export default router;
+    export default router;
