@@ -75,6 +75,23 @@ class ProductService {
       throw error;
     }
   }
+  // PATCH
+  async updatePartialProduct(id: number, productData: Partial<UpdateProductDto>) {
+    const existingProduct = await productRepository.findById(id);
+    if (!existingProduct) throw new Error(`Product with ID ${id} not found`);
+
+    const updatedProduct = await productRepository.update(id, productData);
+    return updatedProduct;
+  }
+
+// Soft DELETE
+  async softDeleteProduct(id: number) {
+    const existingProduct = await productRepository.findById(id);
+    if (!existingProduct) throw new Error(`Product with ID ${id} not found`);
+
+    const updatedProduct = await productRepository.update(id, { isActive: false });
+    return { message: `Product with ID ${id} successfully deactivated` };
+  }
 }
 
 export default new ProductService();
