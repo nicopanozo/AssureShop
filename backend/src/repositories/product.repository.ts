@@ -2,32 +2,29 @@ import prisma from '../config/database';
 import { CreateProductDto, UpdateProductDto, ProductFilters } from '../models/product.model';
 
 class ProductRepository {
-  // Obtener todos los productos
+  // Get all products with filters
   async findAll(filters?: ProductFilters) {
     const where: any = {};
-    
+
     if (filters) {
-      // Aplicar filtros si existen
       if (filters.categoryId !== undefined) {
-        where.categoryId = filters.categoryId;
+        where.category_id = filters.categoryId;
       }
-      
+
       if (filters.isActive !== undefined) {
-        where.isActive = filters.isActive;
+        where.is_active = filters.isActive;
       }
-      
+
       if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
         where.price = {};
-        
         if (filters.minPrice !== undefined) {
           where.price.gte = filters.minPrice;
         }
-        
         if (filters.maxPrice !== undefined) {
           where.price.lte = filters.maxPrice;
         }
       }
-      
+
       if (filters.search) {
         where.OR = [
           { name: { contains: filters.search, mode: 'insensitive' } },
@@ -35,7 +32,7 @@ class ProductRepository {
         ];
       }
     }
-    
+
     return await prisma.product.findMany({
       where,
       include: {
@@ -45,10 +42,10 @@ class ProductRepository {
     });
   }
 
-  // Obtener un producto por ID
+  // Get product by ID
   async findById(id: number) {
     return await prisma.product.findUnique({
-      where: { id },
+      where: { product_id: id },
       include: {
         category: true,
         inventory: true,
@@ -56,9 +53,8 @@ class ProductRepository {
           include: {
             user: {
               select: {
-                id: true,
-                firstName: true,
-                lastName: true,
+                first_name: true,
+                last_name: true,
               },
             },
           },
@@ -67,31 +63,51 @@ class ProductRepository {
     });
   }
 
-  // Crear un nuevo producto
-  async create(data: CreateProductDto) {
+  // Create product
+  async create(product: CreateProductDto) {
     return await prisma.product.create({
-      data,
+      data: {
+        name: product.name,
+        description: product.description ?? null,
+        price: product.price,
+        category_id: product.categoryId,
+        image_url: product.imageUrl ?? null,
+        sku: product.sku ?? null,
+        weight: product.weight ?? null,
+        dimensions: product.dimensions ?? null,
+        is_active: product.isActive ?? true,
+      },
       include: {
         category: true,
       },
     });
   }
 
-  // Actualizar un producto existente
+  // Update product
   async update(id: number, data: UpdateProductDto) {
     return await prisma.product.update({
-      where: { id },
-      data,
+      where: { product_id: id },
+      data: {
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        category_id: data.categoryId,
+        image_url: data.imageUrl,
+        sku: data.sku,
+        weight: data.weight,
+        dimensions: data.dimensions,
+        is_active: data.isActive,
+      },
       include: {
         category: true,
       },
     });
   }
 
-  // Eliminar un producto
+  // Delete product
   async delete(id: number) {
     return await prisma.product.delete({
-      where: { id },
+      where: { product_id: id },
     });
   }
 }

@@ -74,6 +74,23 @@ class ProductService {
     }
   }
 
+  // Soft delete a product by setting is_active to false
+  async softDeleteProduct(id: number) {
+    try {
+      const existingProduct = await productRepository.findById(id);
+      if (!existingProduct) {
+        throw new Error(`Product with ID ${id} not found`);
+      }
+
+      const updatedProduct = await productRepository.update(id, { isActive: false });
+      logger.info(`Product soft deleted with ID: ${updatedProduct.product_id}`);
+      return { message: `Product with ID ${id} successfully deactivated` };
+    } catch (error) {
+      logger.error(`Error soft deleting product with ID ${id}: ${error}`);
+      throw error;
+    }
+  }
+
   // Hard delete a product (permanent)
   async deleteProduct(id: number) {
     try {
@@ -89,23 +106,6 @@ class ProductService {
       logger.error(`Error deleting product with ID ${id}: ${error}`);
       throw error;
     }
-  }
-  // PATCH
-  async updatePartialProduct(id: number, productData: Partial<UpdateProductDto>) {
-    const existingProduct = await productRepository.findById(id);
-    if (!existingProduct) throw new Error(`Product with ID ${id} not found`);
-
-    const updatedProduct = await productRepository.update(id, productData);
-    return updatedProduct;
-  }
-
-// Soft DELETE
-  async softDeleteProduct(id: number) {
-    const existingProduct = await productRepository.findById(id);
-    if (!existingProduct) throw new Error(`Product with ID ${id} not found`);
-
-    const updatedProduct = await productRepository.update(id, { isActive: false });
-    return { message: `Product with ID ${id} successfully deactivated` };
   }
 }
 
