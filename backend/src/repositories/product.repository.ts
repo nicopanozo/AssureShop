@@ -1,7 +1,9 @@
 import prisma from '../config/database';
 import { CreateProductDto, UpdateProductDto, ProductFilters } from '../models/product.model';
+import { Injectable } from '@nestjs/common';
 
-class ProductRepository {
+@Injectable()
+export class ProductRepository {
   // Get all products with filters
   async findAll(filters?: ProductFilters) {
     const where: any = {};
@@ -111,5 +113,3 @@ class ProductRepository {
     });
   }
 }
-
-export default new ProductRepository();

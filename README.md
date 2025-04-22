@@ -1,45 +1,77 @@
-# AssureShop
-# AssureShop
+🛒 AssureShop – Backend
+Backend del sistema de comercio electrónico AssureShop, desarrollado con Node.js, Express y PostgreSQL. Este servicio gestiona productos, categorías y operaciones CRUD, incluyendo eliminaciones suaves (soft delete) y completas (hard delete), utilizando Prisma como ORM.
 
-cp ecommerce_schema.sql /tmp/
+📦 Tecnologías
+Node.js + Express
 
-sudo -u postgres psql -f /tmp/ecommerce_schema.sql
+PostgreSQL + Prisma ORM
 
-rm /tmp/ecommerce_schema.sql
+TypeScript
 
-# DBeaver:
+Jest para pruebas
 
-En la pantalla de Nueva Conexión, los campos deberían verse así:
-Host: localhost
-Puerto: 5432
-Base de datos: ecommerce
-Usuario: [tu_usuario]
-Contraseña: [tu_contraseña]
+Postman para pruebas de API
 
+⚙️ Instalación
+Clonar el repositorio:
 
-# Backend
-cd backend
-# No necesitas ejecutar npm init porque ya creamos el package.json completo
-# Instalar las dependencias
+bash
+Copiar código
+git clone https://github.com/tu_usuario/assureshop.git
+cd assureshop/backend
+Instalar dependencias:
+
+bash
+Copiar código
 npm install
-# Inicializar Prisma con la base de datos existente
+Configurar la base de datos:
+
+Copiar y ejecutar el script SQL:
+
+bash
+Copiar código
+cp ecommerce_schema.sql /tmp/
+sudo -u postgres psql -f /tmp/ecommerce_schema.sql
+rm /tmp/ecommerce_schema.sql
+O crear manualmente la base de datos ecommerce y aplicar el esquema.
+
+Inicializar Prisma:
+
+bash
+Copiar código
 npx prisma init
-# Generar los tipos de Prisma Client
 npx prisma generate
-# Correr el server
+Compilar y ejecutar el servidor:
+
+bash
+Copiar código
 npm run build
 npm run dev
+🧪 Pruebas
+Ejecutar las pruebas unitarias con:
 
-Pruebas más avanzadas
-Puedes intentar agregar un producto usando una solicitud POST:
-En Postman:
+bash
+Copiar código
+npm test
+📬 Prueba rápida con Postman
+Agregar una categoría:
 
-Cambia el método a POST
-Mantén la URL: http://localhost:3000/api/products
-Ve a la pestaña "Body", selecciona "raw" y "JSON"
-Ingresa los datos de un producto de prueba:
+Ejecutar en PostgreSQL:
 
-json{
+sql
+Copiar código
+INSERT INTO categories (name, description) VALUES ('Periféricos', 'Accesorios para computadoras');
+Agregar un producto:
+
+Método: POST
+
+URL: http://localhost:3000/api/products
+
+Body (JSON):
+
+json
+Copiar código
+{
   "name": "Teclado Mecánico Gamer",
   "description": "Teclado mecánico RGB con switches Cherry MX Blue",
   "price": 89.99,
@@ -50,6 +82,34 @@ json{
   "dimensions": "45x15x4 cm",
   "isActive": true
 }
-Nota importante: Para que esta prueba funcione, debes tener al menos una categoría en la tabla categories con id=1. Si tu base de datos está vacía, primero deberías insertar una categoría:
-sqlINSERT INTO categories (name, description) VALUES ('Periféricos', 'Accesorios para computadoras');
-Después de ejecutar esta consulta SQL en tu base de datos, intenta nuevamente la solicitud POST.
+🧰 Scripts útiles
+Comando	Descripción
+npm run dev	Inicia el servidor en modo desarrollo
+npm run build	Compila el proyecto TypeScript
+npm test	Ejecuta las pruebas unitarias
+npx prisma studio	Abre el panel visual de Prisma
+🛡️ Seguridad
+Validación de datos con DTOs
+
+Manejo de errores con logs (logger)
+
+Eliminación suave (isActive: false) y completa (DELETE)
+
+📁 Estructura del proyecto
+pgsql
+Copiar código
+backend/
+├── src/
+│   ├── controllers/
+│   ├── services/
+│   ├── repositories/
+│   ├── models/
+│   ├── routes/
+│   ├── utils/
+│   └── __tests__/
+├── prisma/
+│   └── schema.prisma
+├── package.json
+└── tsconfig.json
+📄 Licencia
+Este proyecto está bajo la licencia de nosotros mismos.

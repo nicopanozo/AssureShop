@@ -3,10 +3,10 @@ import productService from '../../services/product.service';
 import logger from '../../utils/logger';
 
 class ProductController {
-  // GET /products - Obtener todos los productos
+  // GET /products - Get all products
   async getAllProducts(req: Request, res: Response) {
     try {
-      // Extraer parámetros de consulta para filtros
+      // Params for consults
       const filters = {
         categoryId: req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined,
         minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
@@ -78,6 +78,36 @@ class ProductController {
         res.status(404).json({ error: error.message });
       } else {
         res.status(500).json({ error: 'Failed to delete product' });
+      }
+    }
+  }
+  // PATCH /products/:id/soft-delete - Soft delete of a product
+  async softDeleteProduct(req: Request, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+      const result = await productService.softDeleteProduct(id);
+      res.status(200).json(result);
+    } catch (error: any) {
+      logger.error(`Error in softDeleteProduct: ${error.message}`);
+      if (error.message.includes('not found')) {
+        res.status(404).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to soft delete product' });
+      }
+    }
+  }
+  // PATCH /products/:id - Update partially a product
+  async updatePartialProduct(req: Request, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+      const updatedProduct = await productService.updatePartialProduct(id, req.body);
+      res.status(200).json(updatedProduct);
+    } catch (error: any) {
+      logger.error(`Error in updatePartialProduct: ${error.message}`);
+      if (error.message.includes('not found')) {
+        res.status(404).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to update product' });
       }
     }
   }

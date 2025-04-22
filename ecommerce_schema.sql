@@ -170,7 +170,7 @@ FOR EACH ROW EXECUTE FUNCTION update_modified_column();
 
 -- Crear vista para mostrar productos con su inventario
 CREATE VIEW product_inventory_view AS
-SELECT 
+SELECT
     p.product_id,
     p.name,
     p.description,
@@ -178,32 +178,32 @@ SELECT
     c.name AS category,
     i.quantity AS stock,
     CASE WHEN i.quantity > 0 THEN 'In Stock' ELSE 'Out of Stock' END AS availability
-FROM 
+FROM
     products p
-JOIN 
+JOIN
     categories c ON p.category_id = c.category_id
-LEFT JOIN 
+LEFT JOIN
     inventory i ON p.product_id = i.product_id;
 
 -- Crear vista para ver reseñas con información de usuario y producto
 CREATE VIEW detailed_reviews_view AS
-SELECT 
+SELECT
     r.review_id,
     p.name AS product_name,
     u.first_name || ' ' || u.last_name AS reviewer,
     r.rating,
     r.comment,
     r.created_at
-FROM 
+FROM
     reviews r
-JOIN 
+JOIN
     products p ON r.product_id = p.product_id
-JOIN 
+JOIN
     users u ON r.user_id = u.user_id;
 
 -- Crear vista para detalles de órdenes
 CREATE VIEW order_summary_view AS
-SELECT 
+SELECT
     o.order_id,
     u.first_name || ' ' || u.last_name AS customer_name,
     o.order_date,
@@ -211,11 +211,11 @@ SELECT
     o.order_status,
     COUNT(od.product_id) AS total_products,
     SUM(od.quantity) AS total_items
-FROM 
+FROM
     orders o
-JOIN 
+JOIN
     users u ON o.user_id = u.user_id
-JOIN 
+JOIN
     order_details od ON o.order_id = od.order_id
-GROUP BY 
+GROUP BY
     o.order_id, u.first_name, u.last_name;
